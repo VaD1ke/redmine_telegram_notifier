@@ -48,11 +48,11 @@ class Api
     /**
      * Object initialization
      *
-     * @param string $token Bot API token
+     * @param mixed $config Config parser
      */
-    public function __construct($token)
+    public function __construct($config)
     {
-        $this->_url = 'https://api.telegram.org/bot' . $token . '/';
+        $this->_url = 'https://api.telegram.org/bot' . $config->getBotToken() . '/';
     }
 
     /**

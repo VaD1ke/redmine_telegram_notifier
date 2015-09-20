@@ -2,6 +2,7 @@
 namespace App\Bot;
 
 use App\App;
+use \App\Bot\Api as BotApi;
 
 /**
  * Handles updates from API
@@ -18,14 +19,16 @@ class Handler
      */
     const COMMAND_MODELS_ALIAS = '\\App\\Bot\\Command\\';
 
+
     /**
      * Handle Bot API updates
      *
-     * @param array $updates Updates from Bot API
+     * @param array  $updates Updates from Bot API
+     * @param BotApi $botApi  Bot API
      *
      * @return void
      */
-    public function handleBotApiUpdates(array $updates)
+    public function handleBotApiUpdates(array $updates, BotApi $botApi)
     {
         $dataProvider = new Data\Provider();
 
@@ -37,7 +40,7 @@ class Handler
             $message  = trim($updateHelper->getMessageText($update));
 
             /** @var ICommand $commandModel */
-            $commandModel = App::getClassInstance($this->_getCommandClassName($message));
+            $commandModel = App::getClassInstance($this->_getCommandClassName($message), $botApi);
             if ($commandModel) {
                 $commandModel->execute($update);
             }

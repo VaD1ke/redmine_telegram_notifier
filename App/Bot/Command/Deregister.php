@@ -3,8 +3,7 @@ namespace App\Bot\Command;
 
 use \App\Bot\ICommand;
 use \App\Bot\Api as BotApi;
-use App\Bot\Data\Provider as DataProvider;
-use \App\DB\Provider as DbProvider;
+use \App\DB\Adapter\Provider as DbProvider;
 use \App\Bot\Helper\Update as HelperUpdate;
 
 /**
@@ -17,6 +16,23 @@ use \App\Bot\Helper\Update as HelperUpdate;
  */
 class Deregister implements ICommand
 {
+    /**
+     * Bot api
+     *
+     * @var BotApi
+     */
+    protected $_botApi;
+
+    /**
+     * Object initialization
+     *
+     * @param BotApi $botApi Bot API
+     */
+    public function __construct(BotApi $botApi)
+    {
+        $this->_botApi = $botApi;
+    }
+
     /**
      * Execute command
      *
@@ -34,8 +50,7 @@ class Deregister implements ICommand
             $message = $this->_getNotSubscribedMessage($subscriber['name']);
         }
 
-        $botApi = new BotApi(DataProvider::API_KEY);
-        $botApi->sendMessage($subscriber['chat_id'], $message);
+        $this->_botApi->sendMessage($subscriber['chat_id'], $message);
     }
 
 

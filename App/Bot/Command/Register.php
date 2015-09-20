@@ -3,8 +3,7 @@ namespace App\Bot\Command;
 
 use \App\Bot\ICommand;
 use \App\Bot\Api as BotApi;
-use App\Bot\Data\Provider as DataProvider;
-use \App\DB\Provider as DbProvider;
+use \App\DB\Adapter\Provider as DbProvider;
 use App\Bot\Helper\Message as HelperMessage;
 use \App\Bot\Helper\Update as HelperUpdate;
 
@@ -19,6 +18,23 @@ use \App\Bot\Helper\Update as HelperUpdate;
 class Register implements ICommand
 {
     /**
+     * Bot api
+     *
+     * @var BotApi
+     */
+    protected $_botApi;
+
+    /**
+     * Object initialization
+     *
+     * @param BotApi $botApi Bot API
+     */
+    public function __construct(BotApi $botApi)
+    {
+        $this->_botApi = $botApi;
+    }
+
+    /**
      * Execute command
      *
      * @param array $update Update
@@ -32,9 +48,8 @@ class Register implements ICommand
         if (!$subscriber) {
             return;
         }
-        $botApi = new BotApi(DataProvider::API_KEY);
 
-        $botApi->sendMessage( $subscriber['chat_id'], $this->_getSubscribeMessage($subscriber['name']) );
+        $this->_botApi->sendMessage( $subscriber['chat_id'], $this->_getSubscribeMessage($subscriber['name']) );
     }
 
 
@@ -63,7 +78,7 @@ class Register implements ICommand
 
         $provider = new DbProvider();
         if ($chat = $provider->loadChat($chatId)) {
-            $provider->updateChat($chat['chat_id'], $chatName, $redmineKey);
+            $provider->updateChat($chatId, $chatName, $redmineKey);
         } else {
             $provider->addChat($chatId, $chatName, $redmineKey);
         }

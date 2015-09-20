@@ -1,7 +1,8 @@
 {
     "require": {
         "zendframework/zend-loader": "^2.5",
-        "zendframework/zend-http": "^2.5"
+        "zendframework/zend-http": "^2.5",
+        "zendframework/zend-db": "^2.5"
     },
     "repositories": [
         {

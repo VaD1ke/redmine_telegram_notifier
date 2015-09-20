@@ -1,6 +1,8 @@
 <?php
 namespace App\Bot;
 
+use \App\Config\Parser as ConfigParser;
+
 /**
  * Bot updater
  *
@@ -25,12 +27,12 @@ class Updater
      */
     public function checkUpdates()
     {
-        $this->_botApi = new Api(Data\Provider::API_KEY);
+        $this->_botApi = new Api(new ConfigParser());
 
         $helperData = new Data\Provider();
         $updates    = json_decode($this->_botApi->getUpdates($helperData->getBotUpdateId()), true);
 
         $updatesHandler = new Handler();
-        $updatesHandler->handleBotApiUpdates($updates);
+        $updatesHandler->handleBotApiUpdates($updates, $this->_botApi);
     }
 }

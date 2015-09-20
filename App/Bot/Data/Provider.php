@@ -16,7 +16,7 @@ class Provider
      *
      * @var string
      */
-    const API_KEY = 'key';
+    const API_KEY = '126198396:AAHzDX_utzwNxs-j1cx4IQK5ivpCek7zl2Y';
 
     /**
      * Provider
@@ -34,7 +34,13 @@ class Provider
     public function getBotUpdateId()
     {
         $this->_getProvider();
-        return $this->_provider->loadLastUpdate();
+        $lastUpdate = $this->_provider->loadLastUpdate();
+
+        if (!$lastUpdate) {
+            return null;
+        }
+
+        return current(current($lastUpdate));
     }
 
     /**
@@ -59,7 +65,7 @@ class Provider
     protected function _getProvider()
     {
         if (!$this->_provider) {
-            $this->_provider = new \App\DB\Provider();
+            $this->_provider = new \App\DB\Adapter\Provider();
         }
         return $this->_provider;
     }
