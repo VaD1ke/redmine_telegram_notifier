@@ -12,30 +12,34 @@ namespace App;
 class App
 {
     /**
+     * Dependency injection
+     *
+     * @var \Zend\Di\Di
+     */
+    private $_di;
+
+    /**
+     * Object initialization
+     *
+     * @param \Zend\Di\Di $di
+     */
+    public function __construct(\Zend\Di\Di $di)
+    {
+        $this->_di = $di;
+    }
+
+    /**
      * Run
      *
      * @return mixed
      */
     public function run()
     {
-        $updater = new Bot\Updater();
+        $dic = new Model\DiC($this->_di);
+        $dic->assemble();
+
+        /** @var \App\Bot\Updater $updater */
+        $updater = $this->_di->get('BotUpdater');
         $updater->checkUpdates();
-    }
-
-    /**
-     * Get class instance
-     *
-     * @param string $className
-     * @param array $constructArguments
-     *
-     * @return mixed
-     */
-    public static function getClassInstance($className, $constructArguments = [])
-    {
-        if (class_exists($className)) {
-            return new $className($constructArguments);
-        }
-
-        return false;
     }
 }

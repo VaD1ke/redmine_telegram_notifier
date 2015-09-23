@@ -21,14 +21,113 @@ class Provider
      * @var \Zend\Db\Adapter\Adapter
      */
     protected $_adapter;
+    /**
+     * Connect
+     *
+     * @var Connect
+     */
+    protected $_connect;
+    /**
+     * Sql
+     *
+     * @var Sql
+     */
+    protected $_sql;
 
     /**
      * Object initialization
+     *
+     * @param Connect $connect Connect
+     * @param Sql     $sql     Sql
      */
-    public function __construct()
+    public function __construct(Connect $connect, Sql $sql)
     {
-        $connect = new Connect();
+        $this->_connect = $connect;
         $this->_adapter = $connect->getAdapter();
+        $this->_sql     = $sql;
+    }
+
+    /**
+     * Load chat
+     *
+     * @param string  $tableName  Table name
+     * @param string  $primaryKey Primary key
+     * @param integer $id         ID
+     *
+     * @return array
+     */
+    public function load($tableName, $primaryKey, $id)
+    {
+        $select = $this->_sql->select();
+        $select->from($tableName)->where([$primaryKey => $id]);
+
+        $results = $this->_executeSql($this->_sql, $select);
+
+        return $results->toArray();
+    }
+
+    /**
+     * Add
+     *
+     * @param string $tableName Table name
+     * @param array  $data      Data
+     *
+     * @return void
+     */
+    public function add($tableName, array $data)
+    {
+        $insert = $this->_sql->insert();
+        $insert->into($tableName)->values($data);
+        $this->_executeSql($this->_sql, $insert);
+    }
+
+    /**
+     * Update chat
+     *
+     * @param string  $tableName  Table name
+     * @param string  $primaryKey Primary key
+     * @param integer $id         Chat ID
+     * @param array   $data       Data
+     *
+     * @return void
+     */
+    public function update($tableName, $primaryKey, $id, $data)
+    {
+        $update = $this->_sql->update();
+        $update->table($tableName)->set($data)->where([$primaryKey => $id]);
+
+        $this->_executeSql($this->_sql, $update);
+    }
+
+    /**
+     * Delete chat
+     *
+     * @param string  $tableName  Table name
+     * @param string  $primaryKey Primary key
+     * @param integer $id         Chat ID
+     *
+     * @return void
+     */
+    public function delete($tableName, $primaryKey, $id)
+    {
+        $delete = $this->_sql->delete();
+        $delete->from($tableName)->where([$primaryKey => $id]);
+        $this->_executeSql($this->_sql, $delete);
+    }
+
+    /**
+     * Get first row
+     *
+     * @param string $tableName Table name
+     *
+     * @return array
+     */
+    public function loadFirstRow($tableName)
+    {
+        $select = $this->_sql->select($tableName);
+        $select->limit(1);
+
+        return $this->_executeSql($this->_sql, $select)->toArray();
     }
 
     /**
@@ -40,11 +139,10 @@ class Provider
      */
     public function loadChat($id)
     {
-        $sql = new Sql($this->_adapter);
-        $select = $sql->select();
+        $select = $this->_sql->select();
         $select->from('chat')->where(['chat_id' => $id]);
 
-        $results = $this->_executeSql($sql, $select);
+        $results = $this->_executeSql($this->_sql, $select);
 
         return $results->toArray();
     }
@@ -60,14 +158,13 @@ class Provider
      */
     public function addChat($id, $chatName, $redmineId)
     {
-        $sql = new Sql($this->_adapter);
-        $insert = $sql->insert();
+        $insert = $this->_sql->insert();
         $insert->into('chat')->values([
             'chat_id'    => $id,
             'name'       => $chatName,
             'redmine_id' => $redmineId,
         ]);
-        $this->_executeSql($sql, $insert);
+        $this->_executeSql($this->_sql, $insert);
     }
 
     /**
@@ -81,15 +178,13 @@ class Provider
      */
     public function updateChat($id, $chatName, $redmineId)
     {
-        $sql = new Sql($this->_adapter);
-
-        $update = $sql->update();
+        $update = $this->_sql->update();
         $update->table('chat')->set([
             'name'       => $chatName,
             'redmine_id' => $redmineId,
         ])->where(['chat_id' => $id]);
 
-        $this->_executeSql($sql, $update);
+        $this->_executeSql($this->_sql, $update);
     }
 
     /**
@@ -101,10 +196,9 @@ class Provider
      */
     public function deleteChat($id)
     {
-        $sql = new Sql($this->_adapter);
-        $delete = $sql->delete();
+        $delete = $this->_sql->delete();
         $delete->from('chat')->where(['chat_id' => $id]);
-        $this->_executeSql($sql, $delete);
+        $this->_executeSql($this->_sql, $delete);
     }
 
     /**
@@ -114,11 +208,10 @@ class Provider
      */
     public function loadLastUpdate()
     {
-        $sql = new Sql($this->_adapter);
-        $select = $sql->select('last_update');
+        $select = $this->_sql->select('last_update');
         $select->columns(['update_id'])->limit(1);
 
-        return $this->_executeSql($sql, $select)->toArray();
+        return $this->_executeSql($this->_sql, $select)->toArray();
     }
 
     /**
@@ -130,14 +223,13 @@ class Provider
      */
     public function updateLastUpdate($updateId)
     {
-        $sql = new Sql($this->_adapter);
-        $delete = $sql->delete();
+        $delete = $this->_sql->delete();
         $delete->from('last_update');
-        $this->_executeSql($sql, $delete);
+        $this->_executeSql($this->_sql, $delete);
 
-        $insert = $sql->insert();
+        $insert = $this->_sql->insert();
         $insert->into('last_update')->values(['update_id' => $updateId]);
-        $this->_executeSql($sql, $insert);
+        $this->_executeSql($this->_sql, $insert);
     }
 
 

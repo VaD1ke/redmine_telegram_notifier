@@ -12,19 +12,21 @@ namespace App\Bot\Data;
 class Provider
 {
     /**
-     * Api key
-     *
-     * @var string
-     */
-    const API_KEY = '126198396:AAHzDX_utzwNxs-j1cx4IQK5ivpCek7zl2Y';
-
-    /**
      * Provider
      *
      * @var \App\DB\Provider
      */
     protected $_provider;
 
+    /**
+     * Object initialization
+     *
+     * @param \App\DB\Adapter\Provider $provider Provider
+     */
+    public function __construct(\App\DB\Adapter\Provider $provider)
+    {
+        $this->_provider = $provider;
+    }
 
     /**
      * Get update id
@@ -33,7 +35,6 @@ class Provider
      */
     public function getBotUpdateId()
     {
-        $this->_getProvider();
         $lastUpdate = $this->_provider->loadLastUpdate();
 
         if (!$lastUpdate) {
@@ -52,21 +53,16 @@ class Provider
      */
     public function setBotUpdateId($updateId)
     {
-        $this->_getProvider();
         $this->_provider->updateLastUpdate($updateId);
     }
-
 
     /**
      * Get provider
      *
-     * @return \App\DB\Provider
+     * @return \App\DB\Adapter\Provider|\App\DB\Provider
      */
-    protected function _getProvider()
+    public function getProvider()
     {
-        if (!$this->_provider) {
-            $this->_provider = new \App\DB\Adapter\Provider();
-        }
         return $this->_provider;
     }
 }

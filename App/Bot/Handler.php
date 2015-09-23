@@ -1,9 +1,6 @@
 <?php
 namespace App\Bot;
 
-use App\App;
-use \App\Bot\Api as BotApi;
-
 /**
  * Handles updates from API
  *
@@ -17,38 +14,78 @@ class Handler
     /**
      * Command models alias
      */
-    const COMMAND_MODELS_ALIAS = '\\App\\Bot\\Command\\';
+    const COMMAND_MODELS_ALIAS = 'App\\Bot\\Command\\';
 
+    /**
+     * Dependency injection
+     *
+     * @var \Zend\Di\Di
+     */
+    private $_di;
+
+    /**
+     * Data provider
+     *
+     * @var Data\Provider
+     */
+    protected $_dataProvider;
+    /**
+     * Update helper
+     *
+     * @var Helper\Update
+     */
+    protected $_updateHelper;
+
+    /**
+     * Object initialization
+     *
+     * @param \Zend\Di\Di $di
+     */
+    public function __construct(\Zend\Di\Di $di, Data\Provider $dataProvider, Helper\Update $updateHelper)
+    {
+        $this->_di = $di;
+        $this->_dataProvider = $dataProvider;
+        $this->_updateHelper = $updateHelper;
+    }
 
     /**
      * Handle Bot API updates
      *
-     * @param array  $updates Updates from Bot API
-     * @param BotApi $botApi  Bot API
+     * @param array $updates Updates from Bot API
      *
      * @return void
      */
-    public function handleBotApiUpdates(array $updates, BotApi $botApi)
+    public function handleBotApiUpdates(array $updates)
     {
-        $dataProvider = new Data\Provider();
+        $updateId = $this->_dataProvider->getBotUpdateId();
 
-        $updateId = $dataProvider->getBotUpdateId();
-
-        $updateHelper = new Helper\Update();
         foreach ($updates['result'] as $update) {
-            $updateId = $updateHelper->getIncrementedUpdateId($update);
-            $message  = trim($updateHelper->getMessageText($update));
+            $message  = trim($this->_updateHelper->getMessageText($update));
+            $updateId = $this->_updateHelper->getIncrementedUpdateId($update);
+
+            if (!$this->_isCommandExist($this->_getCommandClassName($message))) {
+                continue;
+            }
 
             /** @var ICommand $commandModel */
-            $commandModel = App::getClassInstance($this->_getCommandClassName($message), $botApi);
-            if ($commandModel) {
-                $commandModel->execute($update);
-            }
+            $commandModel = $this->_di->get($this->_getCommandClassName($message));
+            $commandModel->execute($update);
         }
 
-        $dataProvider->setBotUpdateId($updateId);
+        $this->_dataProvider->setBotUpdateId($updateId);
     }
 
+    /**
+     * Is command exist
+     *
+     * @param $commandClass
+     *
+     * @return bool
+     */
+    protected function _isCommandExist($commandClass)
+    {
+        return in_array($commandClass, $this->_di->instanceManager()->getClasses());
+    }
 
     /**
      * Get command class name

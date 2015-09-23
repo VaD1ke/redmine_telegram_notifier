@@ -1,11 +1,12 @@
 <?php
 namespace App\Bot\Command;
 
-use \App\Bot\ICommand;
-use \App\Bot\Api as BotApi;
-use \App\DB\Adapter\Provider as DbProvider;
+use App\Bot\ICommand;
+use App\Bot\CommandAbstract;
+use App\Bot\Model\Chat;
+use App\Bot\Api as BotApi;
 use App\Bot\Helper\Message as HelperMessage;
-use \App\Bot\Helper\Update as HelperUpdate;
+use App\Bot\Helper\Update as HelperUpdate;
 
 /**
  * Register command
@@ -15,23 +16,43 @@ use \App\Bot\Helper\Update as HelperUpdate;
  * @subpackage Bot
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Register implements ICommand
+class Register extends CommandAbstract implements ICommand
 {
     /**
-     * Bot api
+     * Update helper
      *
-     * @var BotApi
+     * @var HelperUpdate
      */
-    protected $_botApi;
+    protected $_updateHelper;
+    /**
+     * Message helper
+     *
+     * @var HelperMessage
+     */
+    protected $_messageHelper;
+    /**
+     * Chat
+     *
+     * @var Chat
+     */
+    protected $_chat;
 
     /**
      * Object initialization
      *
-     * @param BotApi $botApi Bot API
+     * @param BotApi        $botApi        Bot API
+     * @param HelperUpdate  $updateHelper  Update helper
+     * @param helperMessage $messageHelper Message helper
+     * @param Chat          $chat          Chat
      */
-    public function __construct(BotApi $botApi)
-    {
-        $this->_botApi = $botApi;
+    public function __construct(
+        BotApi $botApi, HelperUpdate $updateHelper, HelperMessage $messageHelper, Chat $chat
+    ) {
+        parent::__construct($botApi);
+
+        $this->_updateHelper  = $updateHelper;
+        $this->_messageHelper = $messageHelper;
+        $this->_chat          = $chat;
     }
 
     /**
@@ -49,7 +70,7 @@ class Register implements ICommand
             return;
         }
 
-        $this->_botApi->sendMessage( $subscriber['chat_id'], $this->_getSubscribeMessage($subscriber['name']) );
+        $this->_notify($subscriber['chat_id'], $this->_getSubscribeMessage($subscriber['name']));
     }
 
 
@@ -62,26 +83,20 @@ class Register implements ICommand
      */
     protected function _addSubscriber(array $update)
     {
-        $updateHelper  = new HelperUpdate();
-        $messageHelper = new HelperMessage();
-
         $chatData   = [];
-        $chatId     = $updateHelper->getChatId($update);
-        $chatName   = $updateHelper->getChatName($update);
-        $redmineKey = $messageHelper->getArgumentFromMessage($updateHelper->getMessageText($update));
+        $redmineKey = $this->_messageHelper->getArgumentFromMessage($this->_updateHelper->getMessageText($update));
 
         if (!$redmineKey) {
             return $chatData;
         }
 
-        $chatData = [ 'chat_id' => $chatId, 'name' => $chatName ];
+        $chatData = [
+            'chat_id'    => $this->_updateHelper->getChatId($update),
+            'name'       => $this->_updateHelper->getChatName($update),
+            'redmine_id' => $redmineKey
+        ];
 
-        $provider = new DbProvider();
-        if ($chat = $provider->loadChat($chatId)) {
-            $provider->updateChat($chatId, $chatName, $redmineKey);
-        } else {
-            $provider->addChat($chatId, $chatName, $redmineKey);
-        }
+        $this->_chat->setData($chatData)->save();
 
         return $chatData;
     }

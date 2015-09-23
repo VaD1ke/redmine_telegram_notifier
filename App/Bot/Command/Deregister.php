@@ -1,10 +1,11 @@
 <?php
 namespace App\Bot\Command;
 
-use \App\Bot\ICommand;
-use \App\Bot\Api as BotApi;
-use \App\DB\Adapter\Provider as DbProvider;
-use \App\Bot\Helper\Update as HelperUpdate;
+use App\Bot\ICommand;
+use App\Bot\CommandAbstract;
+use App\Bot\Api as BotApi;
+use App\Bot\Model\Chat;
+use App\Bot\Helper\Update as HelperUpdate;
 
 /**
  * Deregister command
@@ -14,23 +15,34 @@ use \App\Bot\Helper\Update as HelperUpdate;
  * @subpackage Bot
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Deregister implements ICommand
+class Deregister extends CommandAbstract implements ICommand
 {
     /**
-     * Bot api
+     * Update helper
      *
-     * @var BotApi
+     * @var HelperUpdate
      */
-    protected $_botApi;
+    protected $_updateHelper;
+    /**
+     * Chat
+     *
+     * @var Chat
+     */
+    protected $_chat;
 
     /**
      * Object initialization
      *
-     * @param BotApi $botApi Bot API
+     * @param BotApi        $botApi        Bot API
+     * @param HelperUpdate  $updateHelper  Update helper
+     * @param Chat          $chat          Chat
      */
-    public function __construct(BotApi $botApi)
+    public function __construct(BotApi $botApi, HelperUpdate $updateHelper, Chat $chat)
     {
-        $this->_botApi = $botApi;
+        parent::__construct($botApi);
+
+        $this->_updateHelper = $updateHelper;
+        $this->_chat         = $chat;
     }
 
     /**
@@ -50,7 +62,7 @@ class Deregister implements ICommand
             $message = $this->_getNotSubscribedMessage($subscriber['name']);
         }
 
-        $this->_botApi->sendMessage($subscriber['chat_id'], $message);
+        $this->_notify($subscriber['chat_id'], $message);
     }
 
 
@@ -63,17 +75,13 @@ class Deregister implements ICommand
      */
     protected function _deleteSubscriber(array $update)
     {
-        $updateHelper  = new HelperUpdate();
-
-        $chatId   = $updateHelper->getChatId($update);
-        $chatName = $updateHelper->getChatName($update);
+        $chatId   = $this->_updateHelper->getChatId($update);
+        $chatName = $this->_updateHelper->getChatName($update);
         $chatData = [ 'chat_id' => $chatId, 'name' => $chatName ];
 
-        $provider = new DbProvider();
-
-        $chat = $provider->loadChat($chatId);
+        $chat = $this->_chat->setId($chatId)->load();
         if ($chat) {
-            $provider->deleteChat($chatId);
+            $this->_chat->delete();
             $chatData['success'] = true;
         } else {
             $chatData['success'] = false;
