@@ -112,16 +112,6 @@ class DiC
     }
 
     /**
-     * Assemble entity
-     *
-     * @return void
-     */
-//    private function _assembleEntity()
-//    {
-//        $this->_im->setParameters('App\Model\Entity', ['adapter' => 'App\DB\Adapter\Provider']);
-//    }
-
-    /**
      * Assemble bot commands
      *
      * @return void

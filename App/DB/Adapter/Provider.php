@@ -136,38 +136,6 @@ class Provider
 
 
     /**
-     * Get last update
-     *
-     * @return null|string
-     */
-    public function loadLastUpdate()
-    {
-        $select = $this->_sql->select('last_update');
-        $select->columns(['update_id'])->limit(1);
-
-        return $this->_executeSql($this->_sql, $select)->toArray();
-    }
-
-    /**
-     * Set last update
-     *
-     * @param string $updateId Update ID
-     *
-     * @return void
-     */
-    public function updateLastUpdate($updateId)
-    {
-        $delete = $this->_sql->delete();
-        $delete->from('last_update');
-        $this->_executeSql($this->_sql, $delete);
-
-        $insert = $this->_sql->insert();
-        $insert->into('last_update')->values(['update_id' => $updateId]);
-        $this->_executeSql($this->_sql, $insert);
-    }
-
-
-    /**
      * Execute sql
      *
      * @param Sql          $sql       Sql
