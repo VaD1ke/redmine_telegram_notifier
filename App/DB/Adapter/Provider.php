@@ -48,7 +48,7 @@ class Provider
     }
 
     /**
-     * Load chat
+     * Load
      *
      * @param string  $tableName  Table name
      * @param string  $primaryKey Primary key
@@ -82,7 +82,7 @@ class Provider
     }
 
     /**
-     * Update chat
+     * Update
      *
      * @param string  $tableName  Table name
      * @param string  $primaryKey Primary key
@@ -100,7 +100,7 @@ class Provider
     }
 
     /**
-     * Delete chat
+     * Delete
      *
      * @param string  $tableName  Table name
      * @param string  $primaryKey Primary key
@@ -108,10 +108,14 @@ class Provider
      *
      * @return void
      */
-    public function delete($tableName, $primaryKey, $id)
+    public function delete($tableName, $primaryKey = null, $id = null)
     {
         $delete = $this->_sql->delete();
-        $delete->from($tableName)->where([$primaryKey => $id]);
+        $delete->from($tableName);
+
+        if ($primaryKey && $id) {
+            $delete->where([$primaryKey => $id]);
+        }
         $this->_executeSql($this->_sql, $delete);
     }
 
@@ -130,76 +134,6 @@ class Provider
         return $this->_executeSql($this->_sql, $select)->toArray();
     }
 
-    /**
-     * Load chat
-     *
-     * @param integer $id ID
-     *
-     * @return mixed
-     */
-    public function loadChat($id)
-    {
-        $select = $this->_sql->select();
-        $select->from('chat')->where(['chat_id' => $id]);
-
-        $results = $this->_executeSql($this->_sql, $select);
-
-        return $results->toArray();
-    }
-
-    /**
-     * Add chat
-     *
-     * @param integer $id        Chat ID
-     * @param string  $chatName  Chat name
-     * @param string  $redmineId Redmine ID
-     *
-     * @return void
-     */
-    public function addChat($id, $chatName, $redmineId)
-    {
-        $insert = $this->_sql->insert();
-        $insert->into('chat')->values([
-            'chat_id'    => $id,
-            'name'       => $chatName,
-            'redmine_id' => $redmineId,
-        ]);
-        $this->_executeSql($this->_sql, $insert);
-    }
-
-    /**
-     * Update chat
-     *
-     * @param integer $id        Chat ID
-     * @param string  $chatName  Chat name
-     * @param string  $redmineId Redmine ID
-     *
-     * @return void
-     */
-    public function updateChat($id, $chatName, $redmineId)
-    {
-        $update = $this->_sql->update();
-        $update->table('chat')->set([
-            'name'       => $chatName,
-            'redmine_id' => $redmineId,
-        ])->where(['chat_id' => $id]);
-
-        $this->_executeSql($this->_sql, $update);
-    }
-
-    /**
-     * Delete chat
-     *
-     * @param integer $id Chat ID
-     *
-     * @return void
-     */
-    public function deleteChat($id)
-    {
-        $delete = $this->_sql->delete();
-        $delete->from('chat')->where(['chat_id' => $id]);
-        $this->_executeSql($this->_sql, $delete);
-    }
 
     /**
      * Get last update

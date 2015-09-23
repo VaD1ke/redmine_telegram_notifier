@@ -24,11 +24,11 @@ class Handler
     private $_di;
 
     /**
-     * Data provider
+     * Last update
      *
-     * @var Data\Provider
+     * @var Model\LastUpdate
      */
-    protected $_dataProvider;
+    protected $_lastUpdate;
     /**
      * Update helper
      *
@@ -39,12 +39,14 @@ class Handler
     /**
      * Object initialization
      *
-     * @param \Zend\Di\Di $di
+     * @param \Zend\Di\Di      $di             Dependency injection
+     * @param Model\LastUpdate $lastUpdate     Last update
+     * @param Helper\Update    $updateHelper  Updates helper
      */
-    public function __construct(\Zend\Di\Di $di, Data\Provider $dataProvider, Helper\Update $updateHelper)
+    public function __construct(\Zend\Di\Di $di, Model\LastUpdate $lastUpdate, Helper\Update $updateHelper)
     {
-        $this->_di = $di;
-        $this->_dataProvider = $dataProvider;
+        $this->_di           = $di;
+        $this->_lastUpdate   = $lastUpdate;
         $this->_updateHelper = $updateHelper;
     }
 
@@ -57,7 +59,7 @@ class Handler
      */
     public function handleBotApiUpdates(array $updates)
     {
-        $updateId = $this->_dataProvider->getBotUpdateId();
+        $updateId = $this->_lastUpdate->getBotUpdateId();
 
         foreach ($updates['result'] as $update) {
             $message  = trim($this->_updateHelper->getMessageText($update));
@@ -72,7 +74,8 @@ class Handler
             $commandModel->execute($update);
         }
 
-        $this->_dataProvider->setBotUpdateId($updateId);
+        $this->_lastUpdate->setData([ Model\LastUpdate::UPDATE_COLUMN_NAME => $updateId ])
+            ->saveBotUpdateId();
     }
 
     /**

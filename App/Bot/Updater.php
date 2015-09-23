@@ -18,11 +18,11 @@ class Updater
      */
     protected $_botApi;
     /**
-     * Data provider
+     * Last update
      *
-     * @var Data\Provider
+     * @var Model\LastUpdate
      */
-    protected $_dataProvider;
+    protected $_lastUpdate;
     /**
      * Updates handler
      *
@@ -33,14 +33,14 @@ class Updater
     /**
      * Object initialization
      *
-     * @param Api           $api            Bot API
-     * @param Data\Provider $dataProvider   Data provider
-     * @param Handler       $updatesHandler Updates handler
+     * @param Api              $api            Bot API
+     * @param Model\LastUpdate $lastUpdate     Last update
+     * @param Handler          $updatesHandler Updates handler
      */
-    public function __construct(Api $api, Data\Provider $dataProvider, Handler $updatesHandler)
+    public function __construct(Api $api, Model\LastUpdate $lastUpdate, Handler $updatesHandler)
     {
         $this->_botApi         = $api;
-        $this->_dataProvider   = $dataProvider;
+        $this->_lastUpdate     = $lastUpdate;
         $this->_updatesHandler = $updatesHandler;
     }
 
@@ -52,7 +52,7 @@ class Updater
     public function checkUpdates()
     {
         $updates = json_decode(
-            $this->_botApi->getUpdates($this->_dataProvider->getBotUpdateId()), $assoc = true
+            $this->_botApi->getUpdates($this->_lastUpdate->getBotUpdateId()), $assoc = true
         );
 
         $this->_updatesHandler->handleBotApiUpdates($updates);

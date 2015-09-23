@@ -1,8 +1,8 @@
 <?php
 namespace App\Bot;
 
-use \Zend\Http\Client;
-use \Zend\Http\Request;
+use App\Http\Provider;
+use Zend\Http\Request;
 use Zend\Http\Response;
 
 /**
@@ -13,7 +13,7 @@ use Zend\Http\Response;
  * @subpackage Bot
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Api
+class Api extends Provider
 {
     /**
      * Get bot info method
@@ -27,10 +27,6 @@ class Api
      * Send message method
      */
     const SEND_MESSAGE_METHOD = 'sendMessage';
-    /**
-     * Connection adapter
-     */
-    const CONNECTION_ADAPTER = 'Zend\Http\Client\Adapter\Curl';
 
     /**
      * Bot API URL
@@ -38,12 +34,6 @@ class Api
      * @var string
      */
     protected $_url;
-    /**
-     * Http client
-     *
-     * @var \Zend\Http\Client
-     */
-    protected $_httpClient;
 
     /**
      * Object initialization
@@ -66,7 +56,7 @@ class Api
      */
     public function getUpdates($offset = null)
     {
-        $client = $this->_getHttpClient(self::GET_BOT_UPDATES_METHOD, true);
+        $client = $this->_getHttpClient($this->_url . self::GET_BOT_UPDATES_METHOD, true);
 
         if ($offset) {
             $client->setParameterGet([ 'offset' => $offset ]);
@@ -98,7 +88,7 @@ class Api
             'disable_web_page_preview' => 'true',
         ];
 
-        $client = $this->_getHttpClient(self::SEND_MESSAGE_METHOD, true, Request::METHOD_POST);
+        $client = $this->_getHttpClient($this->_url . self::SEND_MESSAGE_METHOD, true, Request::METHOD_POST);
 
         $client->setParameterPost($data);
 
@@ -108,28 +98,5 @@ class Api
         }
 
         return null;
-    }
-
-
-    /**
-     * Get Http client
-     *
-     * @param string $apiMethod   API method
-     * @param bool   $resetParams Reset params
-     * @param string $method      Method
-     *
-     * @return Client
-     */
-    protected function _getHttpClient(
-        $apiMethod = self::GET_BOT_INFO_METHOD, $resetParams = false, $method = Request::METHOD_GET
-    ) {
-        $this->_httpClient = new Client($this->_url . $apiMethod);
-
-        if ($resetParams) {
-            $this->_httpClient->resetParameters(true);
-        }
-        $this->_httpClient->setMethod($method)->setAdapter(self::CONNECTION_ADAPTER);
-
-        return $this->_httpClient;
     }
 }

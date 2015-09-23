@@ -14,7 +14,7 @@ class Provider
     /**
      * Provider
      *
-     * @var \App\DB\Provider
+     * @var \App\DB\Adapter\Provider
      */
     protected $_provider;
 
