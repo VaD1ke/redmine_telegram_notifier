@@ -42,9 +42,8 @@ abstract class Provider
     ) {
         $this->_httpClient = new Client($url);
 
-        if ($resetParams) {
-            $this->_httpClient->resetParameters(true);
-        }
+        $this->_httpClient->resetParameters($resetParams);
+
         $this->_httpClient->setMethod($method)->setAdapter($adapterName);
 
         return $this->_httpClient;

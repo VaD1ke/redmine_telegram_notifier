@@ -1,19 +1,20 @@
 <?php
-namespace App\DB\Adapter;
+namespace App\Model\Entity;
 
+use App\DB\Adapter\Connect;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\SqlInterface;
 
 /**
- * Database provider
+ * Entity collection
  *
  * @category   App
  * @package    App
  * @subpackage DB
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Provider
+class Collection
 {
     /**
      * Database connection
@@ -27,6 +28,12 @@ class Provider
      * @var Sql
      */
     protected $_sql;
+    /**
+     * Sql object
+     *
+     * @var SqlInterface
+     */
+    protected $_sqlObject;
 
     /**
      * Object initialization
@@ -47,16 +54,14 @@ class Provider
      * @param string  $primaryKey Primary key
      * @param integer $id         ID
      *
-     * @return array
+     * @return $this
      */
     public function load($tableName, $primaryKey, $id)
     {
-        $select = $this->_sql->select();
-        $select->from($tableName)->where([$primaryKey => $id]);
+        $this->_sqlObject = $this->_sql->select();
+        $this->_sqlObject->from($tableName)->where([$primaryKey => $id]);
 
-        $results = $this->_executeSql($this->_sql, $select);
-
-        return $results->toArray();
+        return $this;
     }
 
     /**
@@ -117,14 +122,44 @@ class Provider
      *
      * @param string $tableName Table name
      *
-     * @return array
+     * @return $this
      */
     public function loadFirstRow($tableName)
     {
-        $select = $this->_sql->select($tableName);
-        $select->limit(1);
+        $this->_sqlObject = $this->_sql->select($tableName);
+        $this->_sqlObject->limit(1);
 
-        return $this->_executeSql($this->_sql, $select)->toArray();
+        return $this;
+    }
+
+    /**
+     * Get select
+     *
+     * @return \Zend\Db\Sql\Select
+     */
+    public function getSelect()
+    {
+        return $this->_sql->select();
+    }
+
+    /**
+     * Get data
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->_executeSql($this->_sql, $this->_sqlObject)->toArray();
+    }
+
+    /**
+     * Get last generated value
+     *
+     * @return mixed
+     */
+    public function getLastInsertedValue()
+    {
+        return $this->_adapter->getDriver()->getLastGeneratedValue();
     }
 
 

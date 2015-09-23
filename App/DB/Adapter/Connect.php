@@ -16,14 +16,14 @@ class Connect
     /**
      * Database connection
      *
-     * @var PDO
+     * @var Adapter
      */
     private static $_adapter;
 
     /**
      * Connect database
      *
-     * @return bool|PDO
+     * @return bool|Adapter
      */
     public static function getAdapter()
     {

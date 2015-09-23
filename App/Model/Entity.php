@@ -31,22 +31,22 @@ abstract class Entity
      * @var array
      */
     protected $_data = [];
-
     /**
-     * Database adapter
+     * Collection
      *
-     * @var Adapter
+     * @var Entity\Collection
      */
-    private $_adapter;
+    protected $_collection;
 
     /**
      * Object initialization
      *
-     * @param Adapter $adapter DB adapter
+     * @param Adapter           $adapter    DB adapter
+     * @param Entity\Collection $collection Collection
      */
-    public function __construct(Adapter $adapter)
+    public function __construct(Entity\Collection $collection)
     {
-        $this->_adapter = $adapter;
+        $this->_collection = $collection;
     }
 
     /**
@@ -58,9 +58,9 @@ abstract class Entity
     {
         $loaded = null;
         if (array_key_exists($this->_primaryKey, $this->_data) && $this->getId()) {
-            $loaded = $this->_adapter->load($this->_tableName, $this->_primaryKey, $this->getId());
+            $loaded = $this->_collection->load($this->_tableName, $this->_primaryKey, $this->getId())->getData();
         } else {
-            $loaded = $this->_adapter->loadFirstRow($this->_tableName);
+            $loaded = $this->_collection->loadFirstRow($this->_tableName)->getData();
         }
 
         return reset($loaded);
@@ -76,9 +76,9 @@ abstract class Entity
         $loaded = $this->load();
 
         if (array_key_exists($this->_primaryKey, $loaded) && $loaded[$this->_primaryKey]) {
-            $this->_adapter->update($this->_tableName, $this->_primaryKey, $this->getId(), $this->_data);
+            $this->_collection->update($this->_tableName, $this->_primaryKey, $this->getId(), $this->_data);
         } else {
-            $this->_adapter->add($this->_tableName, $this->_data);
+            $this->_collection->add($this->_tableName, $this->_data);
         }
 
         return $this;
@@ -91,7 +91,7 @@ abstract class Entity
      */
     public function delete()
     {
-        $this->_adapter->delete($this->_tableName, $this->_primaryKey, $this->getId());
+        $this->_collection->delete($this->_tableName, $this->_primaryKey, $this->getId());
 
         return $this;
     }

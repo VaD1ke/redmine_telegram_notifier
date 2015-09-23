@@ -113,4 +113,16 @@ class Register extends CommandAbstract implements ICommand
         $message = $chatName . ', ' . 'Вы успешно подписались на уведомления с Redmine!';
         return $message;
     }
+
+    /**
+     * Save Redmine user total issues
+     *
+     * @param string $redmineUser Redmine user
+     *
+     * @return void
+     */
+    protected function _saveRedmineUserTotalIssues($redmineUser)
+    {
+
+    }
 }

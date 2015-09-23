@@ -25,4 +25,14 @@ class Chat extends EntityAbstract
      * @var string
      */
     protected $_primaryKey = 'chat_id';
+
+    /**
+     * Object initialization
+     *
+     * @param Chat\Collection $collection Collection
+     */
+    public function __construct(Chat\Collection $collection)
+    {
+        parent::__construct($collection);
+    }
 }

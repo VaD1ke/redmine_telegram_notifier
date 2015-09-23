@@ -4,7 +4,8 @@
         "zendframework/zend-http": "^2.5",
         "zendframework/zend-db": "^2.5",
         "zendframework/zend-di": "^2.5",
-        "oggettoweb/coding_standard": "dev-master"
+        "oggettoweb/coding_standard": "dev-master",
+        "doctrine/orm": "*"
     },
     "repositories": [
         {
