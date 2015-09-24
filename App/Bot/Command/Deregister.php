@@ -3,8 +3,9 @@ namespace App\Bot\Command;
 
 use App\Bot\ICommand;
 use App\Bot\CommandAbstract;
-use App\Bot\Api as BotApi;
 use App\Bot\Model\Chat;
+use App\Redmine\Model\UserKey;
+use App\Bot\Api as BotApi;
 use App\Bot\Helper\Update as HelperUpdate;
 
 /**
@@ -29,6 +30,12 @@ class Deregister extends CommandAbstract implements ICommand
      * @var Chat
      */
     protected $_chat;
+    /**
+     * User key entity
+     *
+     * @var UserKey
+     */
+    protected $_userKey;
 
     /**
      * Object initialization
@@ -36,13 +43,15 @@ class Deregister extends CommandAbstract implements ICommand
      * @param BotApi        $botApi        Bot API
      * @param HelperUpdate  $updateHelper  Update helper
      * @param Chat          $chat          Chat
+     * @param UserKey       $userKey       Redmine user key
      */
-    public function __construct(BotApi $botApi, HelperUpdate $updateHelper, Chat $chat)
+    public function __construct(BotApi $botApi, HelperUpdate $updateHelper, Chat $chat, UserKey $userKey)
     {
         parent::__construct($botApi);
 
         $this->_updateHelper = $updateHelper;
         $this->_chat         = $chat;
+        $this->_userKey      = $userKey;
     }
 
     /**
@@ -57,6 +66,7 @@ class Deregister extends CommandAbstract implements ICommand
         $subscriber = $this->_deleteSubscriber($update);
 
         if ($subscriber['success']) {
+            $this->_deleteRedmineKey($subscriber['redmineKeyId']);
             $message = $this->_getUnsubscribeMessage($subscriber['name']);
         } else {
             $message = $this->_getNotSubscribedMessage($subscriber['name']);
@@ -82,12 +92,27 @@ class Deregister extends CommandAbstract implements ICommand
         $chat = $this->_chat->setId($chatId)->load();
         if ($chat) {
             $this->_chat->delete();
-            $chatData['success'] = true;
+            $chatData = [
+                'success'      => true,
+                'redmineKeyId' => $chat['redmine_key_id'],
+            ];
         } else {
             $chatData['success'] = false;
         }
 
         return $chatData;
+    }
+
+    /**
+     * Delete redmine key
+     *
+     * @param integer $id ID
+     *
+     * @return void
+     */
+    protected function _deleteRedmineKey($id)
+    {
+        $this->_userKey->setId($id)->delete();
     }
 
     /**

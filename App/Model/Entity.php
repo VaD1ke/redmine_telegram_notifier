@@ -1,8 +1,6 @@
 <?php
 namespace App\Model;
 
-use App\DB\Adapter\Provider as Adapter;
-
 /**
  * Entity abstract
  *
@@ -41,7 +39,6 @@ abstract class Entity
     /**
      * Object initialization
      *
-     * @param Adapter           $adapter    DB adapter
      * @param Entity\Collection $collection Collection
      */
     public function __construct(Entity\Collection $collection)
@@ -57,10 +54,8 @@ abstract class Entity
     public function load()
     {
         $loaded = null;
-        if (array_key_exists($this->_primaryKey, $this->_data) && $this->getId()) {
+        if ($this->_isIdExist()) {
             $loaded = $this->_collection->load($this->_tableName, $this->_primaryKey, $this->getId())->getData();
-        } else {
-            $loaded = $this->_collection->loadFirstRow($this->_tableName)->getData();
         }
 
         return reset($loaded);
@@ -73,9 +68,7 @@ abstract class Entity
      */
     public function save()
     {
-        $loaded = $this->load();
-
-        if (array_key_exists($this->_primaryKey, $loaded) && $loaded[$this->_primaryKey]) {
+        if ($this->_isRowExist()) {
             $this->_collection->update($this->_tableName, $this->_primaryKey, $this->getId(), $this->_data);
         } else {
             $this->_collection->add($this->_tableName, $this->_data);
@@ -109,7 +102,6 @@ abstract class Entity
         $this->_data[$this->_primaryKey] = $id;
         return $this;
     }
-
     /**
      * Get ID
      *
@@ -133,7 +125,6 @@ abstract class Entity
 
         return $this;
     }
-
     /**
      * Get data
      *
@@ -142,5 +133,38 @@ abstract class Entity
     public function getData()
     {
         return $this->_data;
+    }
+
+    /**
+     * Get collection
+     *
+     * @return Entity\Collection
+     */
+    public function getCollection()
+    {
+        return $this->_collection;
+    }
+
+
+    /**
+     * Is ID exist
+     *
+     * @return bool
+     */
+    protected function _isIdExist()
+    {
+        return array_key_exists($this->_primaryKey, $this->_data) && $this->getId();
+    }
+
+    /**
+     * Is row exist
+     *
+     * @return bool
+     */
+    protected function _isRowExist()
+    {
+        $loaded = $this->load();
+
+        return array_key_exists($this->_primaryKey, $loaded) && $loaded[$this->_primaryKey];
     }
 }

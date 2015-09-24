@@ -17,13 +17,6 @@ class Handler
     const COMMAND_MODELS_ALIAS = 'App\\Bot\\Command\\';
 
     /**
-     * Dependency injection
-     *
-     * @var \Zend\Di\Di
-     */
-    private $_di;
-
-    /**
      * Last update
      *
      * @var Model\LastUpdate
@@ -37,10 +30,17 @@ class Handler
     protected $_updateHelper;
 
     /**
+     * Dependency injection
+     *
+     * @var \Zend\Di\Di
+     */
+    private $_di;
+
+    /**
      * Object initialization
      *
-     * @param \Zend\Di\Di      $di             Dependency injection
-     * @param Model\LastUpdate $lastUpdate     Last update
+     * @param \Zend\Di\Di      $di            Dependency injection
+     * @param Model\LastUpdate $lastUpdate    Last update
      * @param Helper\Update    $updateHelper  Updates helper
      */
     public function __construct(\Zend\Di\Di $di, Model\LastUpdate $lastUpdate, Helper\Update $updateHelper)

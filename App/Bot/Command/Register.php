@@ -4,6 +4,7 @@ namespace App\Bot\Command;
 use App\Bot\ICommand;
 use App\Bot\CommandAbstract;
 use App\Bot\Model\Chat;
+use App\Redmine\Model\UserKey;
 use App\Bot\Api as BotApi;
 use App\Bot\Helper\Message as HelperMessage;
 use App\Bot\Helper\Update as HelperUpdate;
@@ -31,11 +32,17 @@ class Register extends CommandAbstract implements ICommand
      */
     protected $_messageHelper;
     /**
-     * Chat
+     * Chat entity
      *
      * @var Chat
      */
     protected $_chat;
+    /**
+     * User key entity
+     *
+     * @var UserKey
+     */
+    protected $_userKey;
 
     /**
      * Object initialization
@@ -44,15 +51,18 @@ class Register extends CommandAbstract implements ICommand
      * @param HelperUpdate  $updateHelper  Update helper
      * @param helperMessage $messageHelper Message helper
      * @param Chat          $chat          Chat
+     * @param UserKey       $userKey       Redmine user key
      */
     public function __construct(
-        BotApi $botApi, HelperUpdate $updateHelper, HelperMessage $messageHelper, Chat $chat
+        BotApi $botApi, HelperUpdate $updateHelper, HelperMessage $messageHelper,
+        Chat $chat, UserKey $userKey
     ) {
         parent::__construct($botApi);
 
         $this->_updateHelper  = $updateHelper;
         $this->_messageHelper = $messageHelper;
         $this->_chat          = $chat;
+        $this->_userKey       = $userKey;
     }
 
     /**
@@ -64,41 +74,83 @@ class Register extends CommandAbstract implements ICommand
      */
     public function execute(array $update)
     {
-        $subscriber = $this->_addSubscriber($update);
+        $subscriber = $this->_getSubscriber($update);
+        if ($subscriber) {
+            $this->_addRedmineKey($update, $subscriber[Chat::COLUMN_REDMINE_KEY_ID]);
+        } else {
+            $keyId      = $this->_addRedmineKey($update);
+            $subscriber = $this->_addSubscriber($update, $keyId);
+        }
 
         if (!$subscriber) {
             return;
         }
 
-        $this->_notify($subscriber['chat_id'], $this->_getSubscribeMessage($subscriber['name']));
+        $this->_notify(
+            $subscriber[Chat::COLUMN_CHAT_ID], $this->_getSubscribeMessage($subscriber[Chat::COLUMN_CHAT_NAME])
+        );
     }
 
 
     /**
-     * Add subscriber
+     * Add redmine key
      *
-     * @param array $update Update
+     * @param array  $update Update
+     * @param number $id     ID
      *
      * @return array
      */
-    protected function _addSubscriber(array $update)
+    protected function _addRedmineKey(array $update, $id = null)
+    {
+        $redmineKey = $this->_messageHelper->getArgumentFromMessage(
+            $this->_updateHelper->getMessageText($update)
+        );
+
+        if ($id) {
+            $this->_userKey->setId($id);
+        }
+
+        $this->_userKey->setKeyId($redmineKey)->save();
+        return $this->_userKey->getCollection()->getLastInsertedValue();
+    }
+
+    /**
+     * Add subscriber
+     *
+     * @param array  $update Update
+     * @param number $keyId  Redmine key ID
+     *
+     * @return array
+     */
+    protected function _addSubscriber(array $update, $keyId = null)
     {
         $chatData   = [];
-        $redmineKey = $this->_messageHelper->getArgumentFromMessage($this->_updateHelper->getMessageText($update));
 
-        if (!$redmineKey) {
+        if (!$keyId) {
             return $chatData;
         }
 
         $chatData = [
-            'chat_id'    => $this->_updateHelper->getChatId($update),
-            'name'       => $this->_updateHelper->getChatName($update),
-            'redmine_id' => $redmineKey
+            Chat::COLUMN_CHAT_ID        => $this->_updateHelper->getChatId($update),
+            Chat::COLUMN_CHAT_NAME      => $this->_updateHelper->getChatName($update),
+            Chat::COLUMN_REDMINE_KEY_ID => $keyId,
         ];
 
         $this->_chat->setData($chatData)->save();
 
         return $chatData;
+    }
+
+    /**
+     * Get subscriber
+     *
+     * @param array $update Update
+     *
+     * @return array
+     */
+    protected function _getSubscriber(array $update)
+    {
+        return $this->_chat->setId($this->_updateHelper->getChatId($update))->load();
     }
 
     /**
@@ -112,17 +164,5 @@ class Register extends CommandAbstract implements ICommand
     {
         $message = $chatName . ', ' . 'Вы успешно подписались на уведомления с Redmine!';
         return $message;
-    }
-
-    /**
-     * Save Redmine user total issues
-     *
-     * @param string $redmineUser Redmine user
-     *
-     * @return void
-     */
-    protected function _saveRedmineUserTotalIssues($redmineUser)
-    {
-
     }
 }

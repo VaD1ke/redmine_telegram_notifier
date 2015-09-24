@@ -38,13 +38,13 @@ class LastUpdate extends EntityAbstract
      */
     public function getBotUpdateId()
     {
-        $lastUpdate = $this->load();
+        $lastUpdate = $this->_collection->loadFirstRow($this->_tableName)->getData();
 
         if (!$lastUpdate) {
             return null;
         }
 
-        return $lastUpdate[self::UPDATE_COLUMN_NAME];
+        return reset($lastUpdate)[self::UPDATE_COLUMN_NAME];
     }
 
     /**

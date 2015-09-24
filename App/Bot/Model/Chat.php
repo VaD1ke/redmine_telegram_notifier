@@ -14,11 +14,24 @@ use \App\Model\Entity as EntityAbstract;
 class Chat extends EntityAbstract
 {
     /**
+     * Chat ID column name
+     */
+    const COLUMN_CHAT_ID = 'chat_id';
+    /**
+     * Chat name column name
+     */
+    const COLUMN_CHAT_NAME = 'chat_name';
+    /**
+     * Redmine key ID column name
+     */
+    const COLUMN_REDMINE_KEY_ID = 'redmine_key_id';
+
+    /**
      * Table name
      *
      * @var string
      */
-    protected $_tableName = 'chat';
+    protected $_tableName = 'bot_chat';
     /**
      * Primary key
      *
@@ -35,4 +48,6 @@ class Chat extends EntityAbstract
     {
         parent::__construct($collection);
     }
+
+
 }

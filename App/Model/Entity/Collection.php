@@ -58,7 +58,7 @@ class Collection
      */
     public function load($tableName, $primaryKey, $id)
     {
-        $this->_sqlObject = $this->_sql->select();
+        $this->_sqlObject = $this->getSelect();
         $this->_sqlObject->from($tableName)->where([$primaryKey => $id]);
 
         return $this;
