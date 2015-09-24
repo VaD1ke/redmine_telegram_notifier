@@ -31,6 +31,7 @@ class LastUpdate extends EntityAbstract
      */
     protected $_primaryKey = null;
 
+
     /**
      * Get update id
      *
@@ -38,7 +39,7 @@ class LastUpdate extends EntityAbstract
      */
     public function getBotUpdateId()
     {
-        $lastUpdate = $this->_collection->loadFirstRow($this->_tableName)->getData();
+        $lastUpdate = $this->_collection->loadFirstRow($this)->getData();
 
         if (!$lastUpdate) {
             return null;

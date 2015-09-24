@@ -67,12 +67,12 @@ class Deregister extends CommandAbstract implements ICommand
 
         if ($subscriber['success']) {
             $this->_deleteRedmineKey($subscriber['redmineKeyId']);
-            $message = $this->_getUnsubscribeMessage($subscriber['name']);
+            $message = $this->_getUnsubscribeMessage($subscriber[Chat::COLUMN_CHAT_NAME]);
         } else {
-            $message = $this->_getNotSubscribedMessage($subscriber['name']);
+            $message = $this->_getNotSubscribedMessage($subscriber[Chat::COLUMN_CHAT_NAME]);
         }
 
-        $this->_notify($subscriber['chat_id'], $message);
+        $this->_notify($subscriber[Chat::COLUMN_CHAT_ID], $message);
     }
 
 
@@ -87,15 +87,13 @@ class Deregister extends CommandAbstract implements ICommand
     {
         $chatId   = $this->_updateHelper->getChatId($update);
         $chatName = $this->_updateHelper->getChatName($update);
-        $chatData = [ 'chat_id' => $chatId, 'name' => $chatName ];
+        $chatData = [ Chat::COLUMN_CHAT_ID => $chatId, Chat::COLUMN_CHAT_NAME => $chatName ];
 
         $chat = $this->_chat->setId($chatId)->load();
         if ($chat) {
             $this->_chat->delete();
-            $chatData = [
-                'success'      => true,
-                'redmineKeyId' => $chat['redmine_key_id'],
-            ];
+            $chatData['success'] = true;
+            $chatData[Chat::COLUMN_REDMINE_KEY_ID] = $chat[Chat::COLUMN_REDMINE_KEY_ID];
         } else {
             $chatData['success'] = false;
         }

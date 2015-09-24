@@ -55,7 +55,7 @@ abstract class Entity
     {
         $loaded = null;
         if ($this->_isIdExist()) {
-            $loaded = $this->_collection->load($this->_tableName, $this->_primaryKey, $this->getId())->getData();
+            $loaded = $this->_collection->load($this)->getData();
         }
 
         return reset($loaded);
@@ -69,9 +69,9 @@ abstract class Entity
     public function save()
     {
         if ($this->_isRowExist()) {
-            $this->_collection->update($this->_tableName, $this->_primaryKey, $this->getId(), $this->_data);
+            $this->_collection->update($this);
         } else {
-            $this->_collection->add($this->_tableName, $this->_data);
+            $this->_collection->add($this);
         }
 
         return $this;
@@ -84,7 +84,7 @@ abstract class Entity
      */
     public function delete()
     {
-        $this->_collection->delete($this->_tableName, $this->_primaryKey, $this->getId());
+        $this->_collection->delete($this);
 
         return $this;
     }
@@ -133,6 +133,26 @@ abstract class Entity
     public function getData()
     {
         return $this->_data;
+    }
+
+    /**
+     * Get primary key
+     *
+     * @return string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->_primaryKey;
+    }
+
+    /**
+     * Get table name
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->_tableName;
     }
 
     /**

@@ -126,4 +126,19 @@ class DiC
             'chat'   => $this->_di->get('Chat')
         ]);
     }
+
+    /**
+     * Assemble entities
+     *
+     * @return void
+     */
+    private function _assembleEntities()
+    {
+        $this->_im->setParameters(
+            'App\Bot\Model\Chat', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
+        );
+        $this->_im->setParameters(
+            'App\Bot\Model\LastUpdate', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
+        );
+    }
 }

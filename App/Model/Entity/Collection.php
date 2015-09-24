@@ -2,6 +2,7 @@
 namespace App\Model\Entity;
 
 use App\DB\Adapter\Connect;
+use App\Model\Entity;
 use Zend\Db\Adapter\Adapter;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\SqlInterface;
@@ -50,16 +51,16 @@ class Collection
     /**
      * Load
      *
-     * @param string  $tableName  Table name
-     * @param string  $primaryKey Primary key
-     * @param integer $id         ID
+     * @param Entity $entity Entity
      *
      * @return $this
      */
-    public function load($tableName, $primaryKey, $id)
+    public function load(Entity $entity)
     {
         $this->_sqlObject = $this->getSelect();
-        $this->_sqlObject->from($tableName)->where([$primaryKey => $id]);
+        $this->_sqlObject
+            ->from($entity->getTableName())
+            ->where([$entity->getPrimaryKey() => $entity->getId()]);
 
         return $this;
     }
@@ -67,32 +68,30 @@ class Collection
     /**
      * Add
      *
-     * @param string $tableName Table name
-     * @param array  $data      Data
+     * @param Entity $entity Entity
      *
      * @return void
      */
-    public function add($tableName, array $data)
+    public function add(Entity $entity)
     {
         $insert = $this->_sql->insert();
-        $insert->into($tableName)->values($data);
+        $insert->into($entity->getTableName())->values($entity->getData());
         $this->_executeSql($this->_sql, $insert);
     }
 
     /**
      * Update
      *
-     * @param string  $tableName  Table name
-     * @param string  $primaryKey Primary key
-     * @param integer $id         Chat ID
-     * @param array   $data       Data
+     * @param Entity $entity Entity
      *
      * @return void
      */
-    public function update($tableName, $primaryKey, $id, $data)
+    public function update(Entity $entity)
     {
         $update = $this->_sql->update();
-        $update->table($tableName)->set($data)->where([$primaryKey => $id]);
+        $update->table($entity->getTableName())
+            ->set($entity->getData())
+            ->where([$entity->getPrimaryKey() => $entity->getId()]);
 
         $this->_executeSql($this->_sql, $update);
     }
@@ -100,19 +99,17 @@ class Collection
     /**
      * Delete
      *
-     * @param string  $tableName  Table name
-     * @param string  $primaryKey Primary key
-     * @param integer $id         Chat ID
+     * @param Entity $entity Entity
      *
      * @return void
      */
-    public function delete($tableName, $primaryKey = null, $id = null)
+    public function delete(Entity $entity)
     {
         $delete = $this->_sql->delete();
-        $delete->from($tableName);
+        $delete->from($entity->getTableName());
 
-        if ($primaryKey && $id) {
-            $delete->where([$primaryKey => $id]);
+        if ($entity->getPrimaryKey() && $entity->getId()) {
+            $delete->where([$entity->getPrimaryKey() => $entity->getId()]);
         }
         $this->_executeSql($this->_sql, $delete);
     }
@@ -120,13 +117,13 @@ class Collection
     /**
      * Get first row
      *
-     * @param string $tableName Table name
+     * @param Entity $entity Entity
      *
      * @return $this
      */
-    public function loadFirstRow($tableName)
+    public function loadFirstRow(Entity $entity)
     {
-        $this->_sqlObject = $this->_sql->select($tableName);
+        $this->_sqlObject = $this->_sql->select($entity->getTableName());
         $this->_sqlObject->limit(1);
 
         return $this;
