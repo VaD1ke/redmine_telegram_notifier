@@ -12,15 +12,15 @@ namespace App\Redmine\Helper;
 class Issue
 {
     /**
-     * Get total count
+     * Get issue ID
      *
-     * @param array $issuesData Issues data
+     * @param array $issue Issue
      *
      * @return mixed
      */
-    public function getTotalCount(array $issuesData)
+    public function getIssueId(array $issue)
     {
-        return $issuesData['total_count'];
+        return $issue['id'];
     }
 
     /**
@@ -45,17 +45,5 @@ class Issue
     public function getAuthorName(array $issue)
     {
         return $issue['author']['name'];
-    }
-
-    /**
-     * Get issue ID
-     *
-     * @param array $issue Issue
-     *
-     * @return mixed
-     */
-    public function getIssueId(array $issue)
-    {
-        return $issue['id'];
     }
 }

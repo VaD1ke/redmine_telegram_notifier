@@ -1,7 +1,7 @@
 <?php
 namespace App\Bot;
 
-use App\Http\Provider;
+use App\Http\Provider as HttpProvider;
 use Zend\Http\Request;
 use Zend\Http\Response;
 
@@ -13,7 +13,7 @@ use Zend\Http\Response;
  * @subpackage Bot
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Api extends Provider
+class Api extends HttpProvider
 {
     /**
      * Get bot info method

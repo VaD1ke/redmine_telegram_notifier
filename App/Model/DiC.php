@@ -74,13 +74,36 @@ class DiC
      *
      * @return void
      */
-    private function _assembleAdapter()
+    private function _assembleCollection()
     {
         $this->_im->setParameters('Zend\Db\Sql\Sql', [
             'adapter' => $this->_di->get('App\DB\Adapter\Connect')->getAdapter()
         ]);
 
-        $this->_im->setParameters('App\DB\Adapter\Provider', ['sql' => $this->_di->get('Zend\Db\Sql\Sql')]);
+        $this->_im->setParameters('App\Model\Entity\Collection', ['sql' => $this->_di->get('Zend\Db\Sql\Sql')]);
+    }
+
+    /**
+     * Assemble entities
+     *
+     * @return void
+     */
+    private function _assembleEntities()
+    {
+        $this->_im->addAlias('Chat', 'App\Bot\Model\Chat');
+        $this->_im->addAlias('LastUpdate', 'App\Bot\Model\LastUpdate');
+        $this->_im->addAlias('UserIssue', 'App\Redmine\Model\UserIssue');
+        $this->_im->addAlias('UserKey', 'App\Redmine\Model\UserKey');
+
+        $this->_im->setParameters(
+            'Chat', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
+        );
+        $this->_im->setParameters(
+            'LastUpdate', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
+        );
+//        $this->_im->setParameters(
+//            'App\Redmine\Model\UserIssue', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
+//        );
     }
 
     /**
@@ -96,19 +119,11 @@ class DiC
         $this->_im->setParameters('App\Bot\Handler', ['di' => $this->_di]);
         $this->_im->addAlias('BotHandler', 'App\Bot\Handler');
 
-        $this->_im->setParameters('App\Bot\Updater', ['api' => $this->_di->get('BotApi')]);
+        $this->_im->setParameters('App\Bot\Updater', [
+            'api'        => $this->_di->get('BotApi'),
+            'lastUpdate' => $this->_di->get('LastUpdate'),
+        ]);
         $this->_im->addAlias('BotUpdater', 'App\Bot\Updater');
-    }
-
-    /**
-     * Assemble bot models
-     *
-     * @return void
-     */
-    private function _assembleBotModels()
-    {
-        $this->_im->addAlias('Chat', 'App\Bot\Model\Chat');
-        $this->_im->addAlias('LastUpdate', 'App\Bot\Model\LastUpdate');
     }
 
     /**
@@ -120,7 +135,9 @@ class DiC
     {
         $this->_im->setParameters('App\Bot\CommandAbstract', ['botApi' => $this->_di->get('BotApi')]);
         $this->_im->setParameters('App\Bot\Command\Register', [
-            'chat'   => $this->_di->get('Chat')
+            'chat'      => $this->_di->get('Chat'),
+            'userIssue' => $this->_di->get('UserIssue'),
+            'userKey'   => $this->_di->get('UserKey'),
         ]);
         $this->_im->setParameters('App\Bot\Command\Deregister', [
             'chat'   => $this->_di->get('Chat')
@@ -128,17 +145,12 @@ class DiC
     }
 
     /**
-     * Assemble entities
+     * Assemble redmine
      *
      * @return void
      */
-    private function _assembleEntities()
+    private function _assembleRedmine()
     {
-        $this->_im->setParameters(
-            'App\Bot\Model\Chat', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
-        );
-        $this->_im->setParameters(
-            'App\Bot\Model\LastUpdate', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
-        );
+        $this->_im->addAlias('RedmineUpdater', 'App\Redmine\Updater');
     }
 }

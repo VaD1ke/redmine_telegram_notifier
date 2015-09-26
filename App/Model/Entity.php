@@ -53,12 +53,11 @@ abstract class Entity
      */
     public function load()
     {
-        $loaded = null;
         if ($this->_isIdExist()) {
-            $loaded = $this->_collection->load($this)->getData();
+            return reset($this->_collection->load($this)->getData());
         }
 
-        return reset($loaded);
+        return null;
     }
 
     /**

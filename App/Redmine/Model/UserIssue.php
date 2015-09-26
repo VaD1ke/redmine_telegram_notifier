@@ -4,30 +4,34 @@ namespace App\Redmine\Model;
 use \App\Model\Entity as EntityAbstract;
 
 /**
- * Redmine user key entity model
+ * Redmine user issue entity model
  *
  * @category   App
  * @package    App
  * @subpackage Bot
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class UserKey extends EntityAbstract
+class UserIssue extends EntityAbstract
 {
     /**
-     * Column key
+     * Key ID column name
      */
-    const COLUMN_KEY = 'key';
+    const COLUMN_KEY_ID = 'key_id';
+    /**
+     * Issue ID column name
+     */
+    const COLUMN_ISSUE_ID = 'issue_id';
 
     /**
      * Table name
      *
      * @var string
      */
-    protected $_tableName = 'redmine_user_key';
+    protected $_tableName = 'redmine_user_issue';
     /**
      * Collection
      *
-     * @var UserKey\Collection
+     * @var UserIssue\Collection
      */
     protected $_collection;
 
@@ -35,9 +39,9 @@ class UserKey extends EntityAbstract
     /**
      * Object initialization
      *
-     * @param UserKey\Collection $collection Collection
+     * @param UserIssue\Collection $collection Collection
      */
-    public function __construct(UserKey\Collection $collection)
+    public function __construct(UserIssue\Collection $collection)
     {
         parent::__construct($collection);
     }
@@ -51,32 +55,35 @@ class UserKey extends EntityAbstract
     {
         return $this->_collection->getByKey($this)->getData();
     }
-
+    /**
+     * Delete by key
+     *
+     * @return $this
+     */
     public function deleteByKey()
     {
         return $this->_collection->deleteByKey($this);
     }
 
     /**
-     * Set key
+     * Set key ID
      *
-     * @param string $key Key
+     * @param string $keyId Key ID
      *
      * @return $this
      */
-    public function setKey($key)
+    public function setKeyId($keyId)
     {
-        $this->_data[self::COLUMN_KEY] = $key;
+        $this->_data[self::COLUMN_KEY_ID] = $keyId;
         return $this;
     }
-
     /**
-     * Get key
+     * Get key ID
      *
      * @return string
      */
-    public function getKey()
+    public function getKeyId()
     {
-        return $this->_data[self::COLUMN_KEY];
+        return $this->_data[self::COLUMN_KEY_ID];
     }
 }

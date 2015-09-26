@@ -66,6 +66,21 @@ class Collection
     }
 
     /**
+     * Load all
+     *
+     * @param Entity $entity Entity
+     *
+     * @return $this
+     */
+    public function loadAll(Entity $entity)
+    {
+        $this->_sqlObject = $this->getSelect();
+        $this->_sqlObject->from($entity->getTableName());
+
+        return $this;
+    }
+
+    /**
      * Add
      *
      * @param Entity $entity Entity

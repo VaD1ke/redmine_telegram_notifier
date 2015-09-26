@@ -39,7 +39,11 @@ class App
         $dic->assemble();
 
         /** @var \App\Bot\Updater $updater */
-        $updater = $this->_di->get('BotUpdater');
-        $updater->checkUpdates();
+//        $botUpdater = $this->_di->get('BotUpdater');
+//        $botUpdater->checkUpdates();
+
+        /** @var \App\Redmine\Updater $redmineUpdater */
+        $redmineUpdater = $this->_di->get('RedmineUpdater');
+        $redmineUpdater->checkUpdates();
     }
 }

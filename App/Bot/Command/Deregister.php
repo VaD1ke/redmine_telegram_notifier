@@ -5,6 +5,7 @@ use App\Bot\ICommand;
 use App\Bot\CommandAbstract;
 use App\Bot\Model\Chat;
 use App\Redmine\Model\UserKey;
+use App\Redmine\Model\UserIssue;
 use App\Bot\Api as BotApi;
 use App\Bot\Helper\Update as HelperUpdate;
 
@@ -36,6 +37,12 @@ class Deregister extends CommandAbstract implements ICommand
      * @var UserKey
      */
     protected $_userKey;
+    /**
+     * User issue entity
+     *
+     * @var UserKey
+     */
+    protected $_userIssue;
 
     /**
      * Object initialization
@@ -44,14 +51,18 @@ class Deregister extends CommandAbstract implements ICommand
      * @param HelperUpdate  $updateHelper  Update helper
      * @param Chat          $chat          Chat
      * @param UserKey       $userKey       Redmine user key
+     * @param UserIssue     $userIssue     User issue
      */
-    public function __construct(BotApi $botApi, HelperUpdate $updateHelper, Chat $chat, UserKey $userKey)
-    {
+    public function __construct(
+        BotApi $botApi, HelperUpdate $updateHelper, Chat $chat,
+        UserKey $userKey, UserIssue $userIssue
+    ) {
         parent::__construct($botApi);
 
         $this->_updateHelper = $updateHelper;
         $this->_chat         = $chat;
         $this->_userKey      = $userKey;
+        $this->_userIssue    = $userIssue;
     }
 
     /**
@@ -66,7 +77,8 @@ class Deregister extends CommandAbstract implements ICommand
         $subscriber = $this->_deleteSubscriber($update);
 
         if ($subscriber['success']) {
-            $this->_deleteRedmineKey($subscriber['redmineKeyId']);
+            $this->_deleteRedmineUserIssues($subscriber[Chat::COLUMN_REDMINE_KEY_ID]);
+            $this->_deleteRedmineKey($subscriber[Chat::COLUMN_REDMINE_KEY_ID]);
             $message = $this->_getUnsubscribeMessage($subscriber[Chat::COLUMN_CHAT_NAME]);
         } else {
             $message = $this->_getNotSubscribedMessage($subscriber[Chat::COLUMN_CHAT_NAME]);
@@ -114,13 +126,24 @@ class Deregister extends CommandAbstract implements ICommand
     }
 
     /**
+     * Delete Redmine user issues
+     *
+     * @param number $keyId  Redmine key ID
+     */
+    protected function _deleteRedmineUserIssues($keyId)
+    {
+        $this->_userIssue->setKeyId($keyId)->deleteByKey();
+    }
+
+
+    /**
      * Get unsubscribe message
      *
      * @param string $chatName Chat name
      *
      * @return string
      */
-    protected function _getUnsubscribeMessage($chatName)
+    private function _getUnsubscribeMessage($chatName)
     {
         $message = $chatName . ', ' . 'Вы успешно отписались от уведомлений!';
         return $message;
@@ -133,7 +156,7 @@ class Deregister extends CommandAbstract implements ICommand
      *
      * @return string
      */
-    protected function _getNotSubscribedMessage($chatName)
+    private function _getNotSubscribedMessage($chatName)
     {
         $message = $chatName . ', ' . 'Вы еще не подписались на уведомления!';
         return $message;

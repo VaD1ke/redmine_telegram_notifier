@@ -1,7 +1,7 @@
 <?php
 namespace App\Redmine;
 
-use App\Http\Provider;
+use App\Http\Provider as HttpProvider;
 use Zend\Http\Response;
 
 /**
@@ -12,12 +12,13 @@ use Zend\Http\Response;
  * @subpackage Bot
  * @author     Vladislav Slesarenko <vslesarenko@oggettoweb.com>
  */
-class Api extends Provider
+class Api extends HttpProvider
 {
     /**
      * Get issues method
      */
     const GET_ISSUES_METHOD = 'issues.json';
+
     /**
      * Param  current user ID
      */
@@ -39,12 +40,6 @@ class Api extends Provider
      * @var string
      */
     protected $_apiKey;
-    /**
-     * Redmine issues offset
-     *
-     * @var string
-     */
-    protected $_offset;
     /**
      * Redmine user ID
      *
@@ -71,7 +66,6 @@ class Api extends Provider
 
         $client->setParameterGet([
             'assigned_to_id' => $this->getUserId(),
-            'offset'         => $this->getOffset(),
             'key'            => $this->getApiKey(),
             'limit'          => $this->getIssueLimit(),
         ]);
@@ -95,7 +89,6 @@ class Api extends Provider
     public function setApiKey($apiKey)
     {
         $this->_apiKey = $apiKey;
-
         return $this;
     }
     /**
@@ -106,29 +99,6 @@ class Api extends Provider
     public function getApiKey()
     {
         return $this->_apiKey;
-    }
-
-    /**
-     * Set offset
-     *
-     * @param string $offset Issues offset
-     *
-     * @return $this
-     */
-    public function setOffset($offset)
-    {
-        $this->_offset = $offset;
-
-        return $this;
-    }
-    /**
-     * Get offset
-     *
-     * @return string
-     */
-    public function getOffset()
-    {
-        return $this->_offset;
     }
 
     /**
