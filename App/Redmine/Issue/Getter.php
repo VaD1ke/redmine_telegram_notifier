@@ -100,13 +100,11 @@ class Getter
     /**
      * Set is only numbers
      *
-     * @param $value
-     *
      * @return $this
      */
-    public function setIsOnlyNumbers($value)
+    public function isOnlyNumbers()
     {
-        $this->_isOnlyNumbers = $value;
+        $this->_isOnlyNumbers = true;
         return $this;
     }
 
