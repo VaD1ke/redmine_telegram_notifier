@@ -39,9 +39,9 @@ class Handler
     /**
      * Object initialization
      *
-     * @param \Zend\Di\Di      $di            Dependency injection
-     * @param Model\LastUpdate $lastUpdate    Last update
-     * @param Helper\Update    $updateHelper  Updates helper
+     * @param \Zend\Di\Di      $di           Dependency injection
+     * @param Model\LastUpdate $lastUpdate   Last update
+     * @param Helper\Update    $updateHelper Updates helper
      */
     public function __construct(\Zend\Di\Di $di, Model\LastUpdate $lastUpdate, Helper\Update $updateHelper)
     {
@@ -81,7 +81,7 @@ class Handler
     /**
      * Is command exist
      *
-     * @param $commandClass
+     * @param string $commandClass Command class
      *
      * @return bool
      */

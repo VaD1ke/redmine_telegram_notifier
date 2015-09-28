@@ -25,20 +25,6 @@ class UserKey extends EntityAbstract
      */
     protected $_tableName = 'redmine_user_key';
 
-    /**
-     * Load by key
-     *
-     * @return array
-     */
-    public function loadByKey()
-    {
-        return $this->_collection->getByKey($this)->getData();
-    }
-
-    public function deleteByKey()
-    {
-        return $this->_collection->deleteByKey($this);
-    }
 
     /**
      * Set key
@@ -52,7 +38,6 @@ class UserKey extends EntityAbstract
         $this->_data[self::COLUMN_KEY] = $key;
         return $this;
     }
-
     /**
      * Get key
      *

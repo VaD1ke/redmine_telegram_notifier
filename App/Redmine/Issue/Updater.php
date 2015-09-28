@@ -32,7 +32,7 @@ class Updater
     /**
      * Object initialization
      *
-     * @param Chat        $chat        Chat
+     * @param Chat         $chat         Chat
      * @param IssueHandler $issueHandler Issue handler
      */
     public function __construct(Chat $chat, IssueHandler $issueHandler)

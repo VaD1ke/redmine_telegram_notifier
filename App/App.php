@@ -21,7 +21,7 @@ class App
     /**
      * Object initialization
      *
-     * @param \Zend\Di\Di $di
+     * @param \Zend\Di\Di $di Dependency injection
      */
     public function __construct(\Zend\Di\Di $di)
     {

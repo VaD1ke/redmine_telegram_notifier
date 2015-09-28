@@ -138,7 +138,7 @@ class Register extends CommandAbstract implements ICommand
     /**
      * Add redmine key
      *
-     * @param number $id     ID
+     * @param number $id ID
      *
      * @return mixed
      */
@@ -230,6 +230,8 @@ class Register extends CommandAbstract implements ICommand
      *
      * @param array  $issues Issues
      * @param number $keyId  Redmine key ID
+     *
+     * @return void
      */
     protected function _addRedmineUserIssues(array $issues, $keyId)
     {
@@ -245,7 +247,9 @@ class Register extends CommandAbstract implements ICommand
     /**
      * Delete Redmine user issues
      *
-     * @param number $keyId  Redmine key ID
+     * @param number $keyId Redmine key ID
+     *
+     * @return void
      */
     protected function _deleteRedmineUserIssues($keyId)
     {

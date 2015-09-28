@@ -47,11 +47,11 @@ class Deregister extends CommandAbstract implements ICommand
     /**
      * Object initialization
      *
-     * @param BotApi        $botApi        Bot API
-     * @param HelperUpdate  $updateHelper  Update helper
-     * @param Chat          $chat          Chat
-     * @param UserKey       $userKey       Redmine user key
-     * @param UserIssue     $userIssue     User issue
+     * @param BotApi       $botApi       Bot API
+     * @param HelperUpdate $updateHelper Update helper
+     * @param Chat         $chat         Chat
+     * @param UserKey      $userKey      Redmine user key
+     * @param UserIssue    $userIssue    User issue
      */
     public function __construct(
         BotApi $botApi, HelperUpdate $updateHelper, Chat $chat,
@@ -128,7 +128,9 @@ class Deregister extends CommandAbstract implements ICommand
     /**
      * Delete Redmine user issues
      *
-     * @param number $keyId  Redmine key ID
+     * @param number $keyId Redmine key ID
+     *
+     * @return void
      */
     protected function _deleteRedmineUserIssues($keyId)
     {

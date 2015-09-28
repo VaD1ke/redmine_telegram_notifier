@@ -101,9 +101,4 @@ class Getter
     {
         return $this->_redmineKey;
     }
-
-    public function getRedmineIssues()
-    {
-
-    }
 }

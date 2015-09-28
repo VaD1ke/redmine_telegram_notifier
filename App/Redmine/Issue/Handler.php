@@ -60,9 +60,9 @@ class Handler
      *
      * @param UserIssue   $userIssue   User issue
      * @param UserKey     $userKey     User key
+     * @param BotApi      $botApi      Bot API
      * @param Getter      $issueGetter Issue getter
      * @param IssueHelper $issueHelper Issue helper
-     * @param BotApi      $botApi      Bot API
      */
     public function __construct(
         UserIssue $userIssue, UserKey $userKey, BotApi $botApi,
@@ -75,6 +75,11 @@ class Handler
         $this->_issueHelper = $issueHelper;
     }
 
+    /**
+     * Handle user issues
+     *
+     * @return void
+     */
     public function handleUserIssues()
     {
         $user = $this->getUserData();
@@ -188,7 +193,7 @@ class Handler
      */
     protected function _saveIssues($keyId, array $issues)
     {
-        foreach($issues as $issue) {
+        foreach ($issues as $issue) {
             $this->_userIssue->setData([
                 UserIssue::COLUMN_KEY_ID   => $keyId,
                 UserIssue::COLUMN_ISSUE_ID => $issue,

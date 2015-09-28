@@ -14,7 +14,7 @@ interface ICommand
     /**
      * Execute command
      *
-     * @param array  $update Update
+     * @param array $update Update
      *
      * @return void
      */

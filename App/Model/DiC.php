@@ -31,7 +31,7 @@ class DiC
     /**
      * Object initialization
      *
-     * @param Di $di
+     * @param Di $di Dependency injection
      */
     public function __construct(Di $di)
     {
@@ -59,7 +59,7 @@ class DiC
     /**
      * Is method assembling (has prefix _assemble)
      *
-     * @param \ReflectionMethod $method
+     * @param \ReflectionMethod $method Reflection method
      *
      * @return bool
      */
@@ -101,9 +101,9 @@ class DiC
         $this->_im->setParameters(
             'LastUpdate', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
         );
-//        $this->_im->setParameters(
-//            'App\Redmine\Model\UserIssue', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
-//        );
+        $this->_im->setParameters(
+            'UserKey', ['collection' => $this->_di->newInstance('App\Model\Entity\Collection')]
+        );
     }
 
     /**

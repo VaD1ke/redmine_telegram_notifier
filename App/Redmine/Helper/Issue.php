@@ -62,7 +62,7 @@ class Issue
     /**
      * Get issues numbers
      *
-     * @param array $issues
+     * @param array $issues Issues
      *
      * @return array
      */
@@ -70,7 +70,7 @@ class Issue
     {
         $issueNumbers = [];
 
-        foreach($issues as $issue) {
+        foreach ($issues as $issue) {
             $issueNumbers[] = $this->getIssueId($issue);
         }
 
