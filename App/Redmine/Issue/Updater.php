@@ -51,7 +51,7 @@ class Updater
         $users = $this->_chat->getCollection()->loadAll($this->_chat)->getData();
 
         foreach ($users as $user) {
-            $this->_issueHandler->handleUserIssues($user);
+            $this->_issueHandler->setUserData($user)->handleUserIssues();
         }
     }
 }

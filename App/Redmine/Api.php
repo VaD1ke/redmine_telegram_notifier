@@ -144,4 +144,14 @@ class Api extends HttpProvider
     {
         return $this->_limit;
     }
+
+    /**
+     * Get URL
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->_url;
+    }
 }

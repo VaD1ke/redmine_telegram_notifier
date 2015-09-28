@@ -86,17 +86,24 @@ class Handler
         $key = $this->_userKey->setId($user[Chat::COLUMN_REDMINE_KEY_ID])->load();
 
         $redmineIssues = $this->_getRedmineIssues($key[UserKey::COLUMN_KEY]);
-        $currentIssues = $this->_getCurrentIssues();
 
-        $newIssueNumbers = $this->_getNewIssueNumbers($redmineIssues, $currentIssues);
+        $redmineIssueNumbers = $this->_issueHelper->getIssueNumbers($redmineIssues);
+        $currentIssueNumbers = $this->_getIssueNumbers($this->_getCurrentIssues());
 
-        if ($newIssueNumbers) {
-            $this->_deleteIssuesByKey($key[UserKey::COLUMN_KEY]);
-            $this->_saveIssues($key[UserKey::COLUMN_KEY], $redmineIssues);
+        $newIssueNumbers = $this->_getNewIssueNumbers($redmineIssueNumbers, $currentIssueNumbers);
 
-            foreach ($newIssueNumbers as $newIssue) {
+        if (!$newIssueNumbers) {
+            return;
+        }
 
-            }
+        $keyId = $key[$this->_userKey->getPrimaryKey()];
+        $this->_deleteIssuesByKey($keyId);
+        $this->_saveIssues($keyId, $redmineIssueNumbers);
+
+        $newIssuesData = $this->_getIssuesDataByNumbers($newIssueNumbers, $redmineIssues);
+
+        foreach ($newIssuesData as $newIssue) {
+            $this->_botApi->sendMessage($user[Chat::COLUMN_CHAT_ID], $this->_getMessageForNewIssue($newIssue));
         }
     }
 
@@ -124,21 +131,6 @@ class Handler
 
 
     /**
-     * Save redmine issues
-     *
-     * @param number $userId        User ID
-     * @param array  $redmineIssues Redmine issue
-     *
-     * @return void
-     */
-    protected function _saveRedmineIssues($userId, array $redmineIssues)
-    {
-        foreach ($redmineIssues as $issue) {
-
-        }
-    }
-
-    /**
      * Get Redmine issues
      *
      * @param string $apiKey API key
@@ -147,7 +139,7 @@ class Handler
      */
     protected function _getRedmineIssues($apiKey)
     {
-        return $this->_issueGetter->setRedmineKey($apiKey)->isOnlyNumbers()->getIssues();
+        return $this->_issueGetter->setRedmineKey($apiKey)->getIssues();
     }
 
     /**
@@ -162,6 +154,18 @@ class Handler
     }
 
     /**
+     * Get issue numbers
+     *
+     * @param array $issues Issue
+     *
+     * @return array
+     */
+    protected function _getIssueNumbers(array $issues)
+    {
+        return array_column($issues, UserIssue::COLUMN_ISSUE_ID);
+    }
+
+    /**
      * Get new issue numbers
      *
      * @param array $redmineIssues Redmine issues
@@ -171,8 +175,6 @@ class Handler
      */
     protected function _getNewIssueNumbers(array $redmineIssues, array $currentIssues)
     {
-        $currentIssues = array_column($currentIssues, UserIssue::COLUMN_ISSUE_ID);
-
         return array_diff($redmineIssues, $currentIssues);
     }
 
@@ -206,9 +208,48 @@ class Handler
         $this->_userIssue->setKeyId($keyId)->deleteByKey();
     }
 
-
-    private function _getNewIssueMessage($issueId)
+    /**
+     * Get issues data by numbers
+     *
+     * @param array $issueNumbers Issue numbers
+     * @param array $issues       Issues data
+     *
+     * @return array
+     */
+    protected function _getIssuesDataByNumbers(array $issueNumbers, array $issues)
     {
+        $issuesData = [];
 
+        foreach ($issueNumbers as $issueNumber) {
+            foreach ($issues as $issue) {
+                if ($this->_issueHelper->getIssueId($issue) != $issueNumber) {
+                    continue;
+                }
+                $issuesData[] = [
+                    'project' => $this->_issueHelper->getProjectName($issue),
+                    'subject' => $this->_issueHelper->getIssueSubject($issue),
+                    'author'  => $this->_issueHelper->getAuthorName($issue),
+                    'number'  => $issueNumber,
+                ];
+                break;
+            }
+        }
+
+        return $issuesData;
+    }
+
+
+    /**
+     * Get message for new issue
+     *
+     * @param array $issueData Issue data
+     *
+     * @return string
+     */
+    private function _getMessageForNewIssue(array $issueData)
+    {
+        return "На Вас была переведена задача\n{$this->_issueGetter->getRedmineUrl($issueData['number'])}\n"
+                . "Тема: '{$issueData['subject']}'\n"
+                . "Создана {$issueData['author']} на проекте {$issueData['project']}";
     }
 }

@@ -24,23 +24,6 @@ class UserKey extends EntityAbstract
      * @var string
      */
     protected $_tableName = 'redmine_user_key';
-    /**
-     * Collection
-     *
-     * @var UserKey\Collection
-     */
-    protected $_collection;
-
-
-    /**
-     * Object initialization
-     *
-     * @param UserKey\Collection $collection Collection
-     */
-    public function __construct(UserKey\Collection $collection)
-    {
-        parent::__construct($collection);
-    }
 
     /**
      * Load by key

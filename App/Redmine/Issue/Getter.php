@@ -15,12 +15,6 @@ use App\Redmine\Helper\Issue as IssueHelper;
 class Getter
 {
     /**
-     * Redmine key
-     *
-     * @var string
-     */
-    protected $_redmineKey;
-    /**
      * Redmine API
      *
      * @var RedmineApi
@@ -34,11 +28,11 @@ class Getter
     protected $_issueHelper;
 
     /**
-     * is only numbers
+     * Redmine key
      *
-     * @var boolean
+     * @var string
      */
-    private $_isOnlyNumbers;
+    protected $_redmineKey;
 
     /**
      * Object initialization
@@ -64,15 +58,26 @@ class Getter
         );
 
         if (array_key_exists('issues', $issues) && $issues['issues']) {
-            if ($this->_isOnlyNumbers) {
-                return $this->_getIssueNumbers($issues['issues']);
-            }
             return $issues['issues'];
         }
 
         return [];
     }
 
+    /**
+     * Get Redmine IRL
+     *
+     * @param number $issueNumber Issue number
+     *
+     * @return string
+     */
+    public function getRedmineUrl($issueNumber = null)
+    {
+        if ($issueNumber) {
+            return $this->_redmineApi->getUrl() . 'issues/' . $issueNumber;
+        }
+        return $this->_redmineApi->getUrl();
+    }
 
 
     /**
@@ -97,33 +102,8 @@ class Getter
         return $this->_redmineKey;
     }
 
-    /**
-     * Set is only numbers
-     *
-     * @return $this
-     */
-    public function isOnlyNumbers()
+    public function getRedmineIssues()
     {
-        $this->_isOnlyNumbers = true;
-        return $this;
-    }
 
-
-    /**
-     * Get issues numbers
-     *
-     * @param array $issues
-     *
-     * @return array
-     */
-    protected function _getIssueNumbers(array $issues)
-    {
-        $issueNumbers = [];
-
-        foreach($issues as $issue) {
-            $issueNumbers[] = $this->_issueHelper->getIssueId($issue);
-        }
-
-        return $issueNumbers;
     }
 }

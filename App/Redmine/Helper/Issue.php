@@ -24,6 +24,18 @@ class Issue
     }
 
     /**
+     * Get issue subject
+     *
+     * @param array $issue Issue
+     *
+     * @return mixed
+     */
+    public function getIssueSubject(array $issue)
+    {
+        return $issue['subject'];
+    }
+
+    /**
      * Get project name
      *
      * @param array $issue Issue
@@ -45,5 +57,23 @@ class Issue
     public function getAuthorName(array $issue)
     {
         return $issue['author']['name'];
+    }
+
+    /**
+     * Get issues numbers
+     *
+     * @param array $issues
+     *
+     * @return array
+     */
+    public function getIssueNumbers(array $issues)
+    {
+        $issueNumbers = [];
+
+        foreach($issues as $issue) {
+            $issueNumbers[] = $this->getIssueId($issue);
+        }
+
+        return $issueNumbers;
     }
 }
