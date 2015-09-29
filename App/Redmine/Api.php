@@ -26,7 +26,7 @@ class Api extends HttpProvider
     /**
      * Param issues limit
      */
-    const PARAM_ISSUES_LIMIT = 50;
+    const PARAM_ISSUES_LIMIT = 100;
 
     /**
      * Redmine API URL
