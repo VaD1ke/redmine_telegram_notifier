@@ -234,6 +234,7 @@ class Handler
                     'project' => $this->_issueHelper->getProjectName($issue),
                     'subject' => $this->_issueHelper->getIssueSubject($issue),
                     'author'  => $this->_issueHelper->getAuthorName($issue),
+                    'status'  => $this->_issueHelper->getIssueStatus($issue),
                     'number'  => $issueNumber,
                 ];
                 break;
@@ -255,6 +256,7 @@ class Handler
     {
         return "На Вас была переведена задача\n{$this->_issueGetter->getRedmineUrl($issueData['number'])}\n"
                 . "Тема: '{$issueData['subject']}'\n"
+                . "Статус: {$issueData['status']}\n"
                 . "Создана {$issueData['author']} на проекте {$issueData['project']}";
     }
 }

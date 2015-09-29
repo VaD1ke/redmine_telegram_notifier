@@ -111,6 +111,10 @@ class Register extends CommandAbstract implements ICommand
     {
         $this->_redmineKeyValue = $this->_getRedmineKeyFromUpdate($update);
 
+        if (!$this->_redmineKeyValue) {
+            return;
+        }
+
         $subscriber = $this->_getSubscriber($update);
 
         if ($subscriber) {

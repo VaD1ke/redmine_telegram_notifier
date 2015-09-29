@@ -60,6 +60,18 @@ class Issue
     }
 
     /**
+     * Get issue status
+     *
+     * @param array $issue Array
+     *
+     * @return mixed
+     */
+    public function getIssueStatus(array $issue)
+    {
+        return $issue['status']['name'];
+    }
+
+    /**
      * Get issues numbers
      *
      * @param array $issues Issues
