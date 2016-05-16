@@ -254,9 +254,8 @@ class Handler
      */
     private function _getMessageForNewIssue(array $issueData)
     {
-        return "На Вас была переведена задача\n{$this->_issueGetter->getRedmineUrl($issueData['number'])}\n"
-                . "Тема: '{$issueData['subject']}'\n"
-                . "Статус: {$issueData['status']}\n"
-                . "Создана {$issueData['author']} на проекте {$issueData['project']}";
+        return "{$issueData['project']}. {$issueData['status']}. "
+                . "{$this->_issueGetter->getRedmineUrl($issueData['number'])}\n"
+                . "{$issueData['subject']}";
     }
 }
