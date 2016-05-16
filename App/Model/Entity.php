@@ -184,6 +184,6 @@ abstract class Entity
     {
         $loaded = $this->load();
 
-        return array_key_exists($this->_primaryKey, $loaded) && $loaded[$this->_primaryKey];
+        return $loaded && array_key_exists($this->_primaryKey, $loaded) && $loaded[$this->_primaryKey];
     }
 }
